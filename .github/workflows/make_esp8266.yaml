@@ -1,0 +1,65 @@
+name: Reusable ESP32 variants build firmware
+
+on:
+    workflow_call:
+        inputs:
+            board:
+                required: true
+                type: string
+            path:
+                required: true
+                type: string
+jobs:
+    build: 
+      # cannnot compile and build for ESP8266
+      if: false 
+      runs-on: ubuntu-latest
+
+      steps:
+      - uses: actions/checkout@v4
+
+      - name: Exporting xtensa gcc path
+        run: echo "ESP_ESPRESSIF_ROOT=/usr/lib/espressif" >> $GITHUB_ENV
+
+      - name: Install tools
+        run: |
+          sudo mkdir /usr/lib/espressif
+          wget https://github.com/jepler/esp-open-sdk/releases/download/2018-06-10/xtensa-lx106-elf-standalone.tar.gz
+          sudo tar zxvf xtensa-lx106-elf-standalone.tar.gz -C /usr/lib/espressif
+          sudo rm /usr/lib/espressif/xtensa-lx106-elf/bin/esptool.py
+          pip install esptool freezefs
+          
+      - name: Update repos
+        run: |
+          git submodule update --init lib/micropython
+          make -C lib/micropython/mpy-cross
+          
+      - name: Make submodules    
+        working-directory: lib/micropython
+        run: |
+          git submodule update --init lib/stm32lib lib/berkeley-db-1.xx
+          make -C ports/${{ inputs.board }} submodules
+          
+      - name: Make frozen extractable files    
+        run: |
+          git submodule update --init micropython-wifi-setup
+          python -m freezefs modules/micropython-wifi-setup frozen-wifi-setup.py
+          freezefs.py src src.py --target=. --on_import=extract --compress
+          make -C ports/${{ inputs.board }} submodules
+          
+      - name: Compile firmware
+        working-directory: boards/${{ inputs.path }}
+        run: |
+          echo "${{ env.ESP_ESPRESSIF_ROOT}}/xtensa-lx106-elf/bin" >> $GITHUB_PATH
+          /usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc -v
+          make CROSS_COMPILE=/usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-
+
+      - name: Check output
+        working-directory: boards/${{ inputs.path }}
+        run: ls -al build/firmware.bin
+
+      - name: Save binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.board }}-binary
+          path: boards/${{ inputs.path }}/build/firmware.bin

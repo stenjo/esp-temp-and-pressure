@@ -1,0 +1,107 @@
+{
+    "configurations": [
+        {
+            "name": "ESP8266",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/boards/ESP8266_GENERIC",
+                "${workspaceFolder}/lib/micropython/",
+                "${workspaceFolder}/cmodules/uICAL",
+                "${workspaceFolder}/lib/micropython/ports/esp32",
+                "${workspaceFolder}/lib/micropython/ports/esp8266",
+                "~/esp/xtensa-lx106-elf/xtensa-lx106-elf/include/c++/8.4.0",
+                "~/esp/xtensa-lx106-elf/xtensa-lx106-elf/include/c++/8.4.0/xtensa-lx106-elf",
+                "~/esp/xtensa-lx106-elf/xtensa-lx106-elf/include/c++/8.4.0/backward",
+                "~/esp/xtensa-lx106-elf/lib/gcc/xtensa-lx106-elf/8.4.0/include",
+                "~/esp/xtensa-lx106-elf/lib/gcc/xtensa-lx106-elf/8.4.0/include-fixed",
+                "~/esp/xtensa-lx106-elf/xtensa-lx106-elf/sys-include",
+                "~/esp/xtensa-lx106-elf/xtensa-lx106-elf/include",
+                "~/esp/xtensa-lx106-elf/include",
+                "~/esp/xtensa-lx106-elf//xtensa-lx106-elf/include/machine",
+                "~/esp/esp-idf/components/driver/spi/include",
+                "~/esp/esp-idf/components/esp_common/include",
+                "~/esp/esp-idf/components/hal/include",
+                "~/esp/esp-idf/components/soc/esp32/include",
+                "~/esp/esp-idf/components/esp_system/include",
+                "~/esp/esp-idf/components/esp_hw_support/include",
+                "~/esp/esp-idf/components/driver/gpio/include",
+                "~/esp/esp-idf/components/esp_rom/include"
+            ],
+            "defines": [
+                "MICROPY_ROM_TEXT_COMPRESSION=1",
+                "MICROPY_PY_SSL=1",
+                "MICROPY_SSL_AXTLS=1",
+                "MICROPY_ESP8266_2M",
+                "MICROPY_VFS_FAT=1",
+                "MICROPY_VFS_LFS2=1",
+                "MICROPY_PY_SSL=1",
+                "MICROPY_SSL_AXTLS=1",
+                "UART_OS=-1",
+                "__ets__",
+                "ICACHE_FLASH",
+                "LWIP_OPEN_SRC",
+                "NDEBUG",
+                "MODULE_UICAL_ENABLED=1",
+                "MICROPY_PY_ESPNOW=1",
+                "MICROPY_ROM_TEXT_COMPRESSION=1",
+                "NO_QSTR"
+            ],
+            "compilerPath": "~/.espressif/tools/xtensa-esp32-elf/esp-12.2.0_20230208/xtensa-esp32-elf/bin/xtensa-esp32-elf-g++",
+            "intelliSenseMode": "g++-x64",
+            "cStandard": "gnu99",
+            "cppStandard": "gnu++17",
+            "compilerArgs": [
+                "-Wall ",
+                "-Wextra ",
+                "-Os ",
+                "-g ",
+                "-E",
+                "-Wpointer-arith",
+                "-Werror",
+                "-std=gnu99",
+                "-nostdlib",
+                "-fsingle-precision-constant",
+                "-Wdouble-promotion",
+                "-fno-inline-functions",
+                "-Wl",
+                "-EL",
+                "-mlongcalls",
+                "-mtext-section-literals",
+                "-mforce-l32",
+                "-fdata-sections",
+                "-ffunction-sections"
+            ]
+        },
+        {
+            "name": "ESP32",
+            "includePath": [
+                "/Users/sten.johnsen/esp/esp-idf/components/**",
+                "/Users/sten.johnsen/git/dot-matrix-calendar/**",
+                "/Users/sten.johnsen/.espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/include"
+            ],
+            "defines": [],
+            "macFrameworkPath": [],
+            "compilerPath": "/Users/sten.johnsen/.espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-g++",
+            "cStandard": "c99",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPathInCppPropertiesJson": "~/.espressif/tools/xtensa-esp32-elf/esp-12.2.0_20230208/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc",
+            "compilerArgs": [
+                "-I lib/micropython"
+            ],
+            "mergeConfigurations": false,
+            "browse": {
+                "path": [
+                    "/Users/sten.johnsen/esp/esp-idf/components/**",
+                    "/Users/sten.johnsen/git/dot-matrix-calendar/**",
+                    "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/uICAL",
+                    "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/uICAL/includes",
+                    "/Users/sten.johnsen/.espressif/tools/xtensa-esp32-elf/esp-12.2.0_20230208/xtensa-esp32-elf/include",
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        }
+    ],
+    "version": 4
+}

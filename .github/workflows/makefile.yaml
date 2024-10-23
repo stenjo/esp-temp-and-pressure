@@ -1,0 +1,38 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore: ['**/version.txt']
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore: ['**/version.txt']
+
+jobs:
+
+  esp8266:
+    uses: ./.github/workflows/make_esp8266.yaml
+    with:
+      board: esp8266
+      path: ESP8266_GENERIC
+
+  esp32:
+    uses: ./.github/workflows/make_esp32.yaml
+    with:
+      board: esp32
+      path: CUSTOM_ESP32
+
+  esp32s2:
+    uses: ./.github/workflows/make_esp32.yaml
+    with:
+      board: esp32s2
+      path: LOLIN_S2_MINI
+
+  esp32s3:
+    uses: ./.github/workflows/make_esp32.yaml
+    with:
+      board: esp32s3
+      path: LOLIN_S2_MINI
+
+
+  

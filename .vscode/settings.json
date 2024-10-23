@@ -1,0 +1,68 @@
+{
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "${workspaceFolder}/tests",
+        "-p",
+        "test_*.py"
+    ],
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/cmodules/IcsParser"
+    ],
+    "cSpell.words": [
+        "ICAL",
+        "icalendar",
+        "micropython",
+        "mrequests",
+        "rrule"
+    ],
+    "python.languageServer": "Pylance",
+    "coverage-gutters.coverageReportFileName": "coverage.lcov",
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "${workspaceFolder}/modules",
+        "MICROPYPATH": "${workspaceFolder}/modules"
+    },
+    "C_Cpp.default.compilerArgs": [
+        "-I lib/micropython"
+    ],
+    "files.associations": {
+        "obj.h": "c",
+        "rruleiter.h": "c",
+        "rrule.h": "c",
+        "binary.h": "c",
+        "nlr.h": "c",
+        "mphal.h": "c",
+        "mpconfig.h": "c",
+        "base.h": "c",
+        "runtime.h": "c",
+        "iosfwd": "cpp",
+        "mpstate.h": "c",
+        "pystack.h": "c",
+        "regex": "c",
+        "modmachine.h": "c",
+        "max7219.h": "c",
+        "misc.h": "c",
+        "mp_rrule.h": "c",
+        "vector": "cpp",
+        "stdlib.h": "c",
+        "setjmp.h": "c",
+        "ics_parser.h": "c",
+        "__locale": "c",
+        "max7219_priv.h": "c",
+        "gpio.h": "c",
+        "esp_log.h": "c",
+        "spi_master.h": "c",
+        "spi_common.h": "c",
+        "spi_types.h": "c",
+        "esp_attr.h": "c",
+        "locale": "c",
+        "ctime": "c"
+    },
+    "cmake.configureOnOpen": false,
+    "idf.port": "/dev/cu.usbmodem1234561",
+    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
+    "C_Cpp.default.compileCommands": "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/ics/builddir/compile_commands.json",
+    "unityExplorer.unitUnderTestFolder": "./test"
+}

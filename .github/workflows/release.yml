@@ -1,0 +1,117 @@
+name: Release
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**/version.txt']
+  workflow_dispatch:
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+        release: ${{ steps.release.outputs.release_created }}
+        tag: ${{ steps.release.outputs.tag_name }}
+    steps:
+ 
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          release-type: simple
+          token: ${{secrets.PERSONAL_ACCESS_TOKEN}}
+
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Update version.txt
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        continue-on-error: true
+        run: |
+          # Extract the version number from the latest git tag
+          VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
+          
+          # Update version.txt with the new version in the src/ subfolder
+          echo $VERSION > src/version.txt
+          
+          # Optionally commit and push version.txt to the repo
+          git config --global credential.helper '!f() { sleep 1; echo "username=git token=${{ secrets.PERSONAL_ACCESS_TOKEN }}"; }; f'
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add src/version.txt
+          git commit -m "chore: update version.txt to $VERSION"
+          git push
+    
+      - name: tag major and minor versions
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+            git config user.name github-actions[bot]
+            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+            git remote add gh-token "https://${{ secrets.GITHUB_TOKEN }}@github.com/googleapis/release-please-action.git"
+            git tag -d v${{ steps.release.outputs.major }} || true
+            git tag -d v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
+            git push origin :v${{ steps.release.outputs.major }} || true
+            git push origin :v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} || true
+            git tag -a v${{ steps.release.outputs.major }} -m "Release v${{ steps.release.outputs.major }}"
+            git tag -a v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }} -m "Release v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}"
+            git push origin v${{ steps.release.outputs.major }}
+            git push origin v${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}
+
+  esp32:
+    needs: release-please
+    uses: ./.github/workflows/make_esp32.yaml
+    with:
+      board: esp32
+      path: CUSTOM_ESP32
+
+  esp32s2:
+    needs: release-please
+    uses: ./.github/workflows/make_esp32.yaml
+    with:
+      board: esp32s2
+      path: LOLIN_S2_MINI
+
+  esp32s3:
+    needs: release-please
+    uses: ./.github/workflows/make_esp32.yaml
+    with:
+      board: esp32s3
+      path: LOLIN_S2_MINI
+
+  upload-esp32:
+    if: ${{ needs.release-please.outputs.release }}
+    needs: [release-please, esp32]
+    uses: ./.github/workflows/upload-release.yaml
+    secrets: inherit
+    with:
+      board: esp32
+      path: CUSTOM_ESP32
+      tag: ${{ needs.release-please.outputs.tag }}
+
+  upload-esp32s2:
+    if: ${{ needs.release-please.outputs.release }}
+    needs: [release-please, esp32s2]
+    uses: ./.github/workflows/upload-release.yaml
+    secrets: inherit
+    with:
+      board: esp32s2
+      path: LOLIN_S2_MINI
+      tag: ${{ needs.release-please.outputs.tag }}
+
+  upload-esp32s3:
+    if: ${{ needs.release-please.outputs.release }}
+    needs: [release-please, esp32s3]
+    uses: ./.github/workflows/upload-release.yaml
+    secrets: inherit
+    with:
+      board: esp32s3
+      path: LOLIN_S3_MINI
+      tag: ${{ needs.release-please.outputs.tag }}
+

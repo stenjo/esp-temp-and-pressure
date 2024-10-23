@@ -11,8 +11,8 @@ BOARD ?= ESP8266_GENERIC
 USB ?= /dev/cu.usbserial-FTB6SPL3
 
 # Location of MicroPython repository.
-PORT_DIR ?= $(abspath $(MICROPY_TOP)/ports/esp8266) 
 MICROPY_TOP ?= $(abspath lib/micropython)
+PORT_DIR ?= $(abspath $(MICROPY_TOP)/ports/esp8266) 
 
 FROZEN_MANIFEST?=$(abspath manifest.py)
 

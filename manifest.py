@@ -4,7 +4,7 @@ include("$(PORT_DIR)/boards/manifest.py")
 # include our own extra...
 # module("datetime.py", base_path="modules")
 # package("mrequests", base_path="modules/mrequests")
-# module("time.py", base_path="modules")
+module("time.py", base_path="modules")
 # module("msgpack.py", base_path="modules")
 # package("slim", base_path="modules/micropython-wifi-setup/lib")
 # package("micro_web_srv_2", base_path="modules/micropython-wifi-setup/lib")

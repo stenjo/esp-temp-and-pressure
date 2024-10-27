@@ -7,13 +7,14 @@
 BOARD ?= ESP8266_GENERIC
 
 # USB port
-# USB ?= /dev/cu.usbserial-1410
+# USB ?= /dev/cu.usbserial-10
 USB ?= /dev/cu.usbserial-FTB6SPL3
 
 # Location of MicroPython repository.
 MICROPY_TOP ?= $(abspath lib/micropython)
 PORT_DIR ?= $(abspath $(MICROPY_TOP)/ports/esp8266) 
 
+# FROZEN_MANIFEST?=$(PORT_DIR)/boards/$(BOARD)/manifest_512kiB.py
 FROZEN_MANIFEST?=$(abspath manifest.py)
 
 PROJECT_TOP?=$(abspath .)
@@ -58,20 +59,25 @@ erase:
 	$(Q)esptool.py --port $(PORT) --baud $(BAUD) erase_flash
 
 reset:
-	echo -e "\r\nimport machine; machine.reset()\r\n" >$(PORT)
+	rshell -p $(PORT) "repl ~ import machine ~ machine.reset() ~"
+	sleep 2
 
 mon:
 	picocom $(USB) --b $(BAUD)
 
 prepare:
 	$(ECHO) "Preparing submodules and frozen files"
+	$(Q)$(MAKE) -C $(MICROPY_TOP)/mpy-cross
+	$(Q)$(MAKE) -C $(MICROPY_TOP)/ports/unix submodules
+	$(Q)$(MAKE) -C $(MICROPY_TOP)/ports/esp8266 submodules
+
+update:
 	git submodule update --init $(MICROPY_TOP)
 	git submodule update --init $(PROJECT_TOP)/modules/micropython-wifi-setup
 	git submodule update --init $(PROJECT_TOP)/modules/mrequests
-	$(Q)$(MAKE) -C $(MICROPY_TOP)/mpy-cross
-	$(Q)$(MAKE) -C $(MICROPY_TOP)/ports/unix submodules
 	python3 -m freezefs $(PROJECT_TOP)/modules/micropython-wifi-setup/lib/wifi_setup $(PROJECT_TOP)/modules/frozen_wifi_setup.py -ov always
 	python3 -m freezefs $(PROJECT_TOP)/modules/micropython-wifi-setup/lib/micro_web_srv_2 $(PROJECT_TOP)/modules/frozen_micro_web_srv_2.py -ov always
+	python3 -m freezefs $(PROJECT_TOP)/modules/micropython-wifi-setup/lib/slim $(PROJECT_TOP)/modules/frozen_slim.py -ov always
 
 copy:
 	rshell -p  $(PORT) rsync src /pyboard

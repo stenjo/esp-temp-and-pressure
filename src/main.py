@@ -13,6 +13,10 @@ MQTT_DISCOVERY_TOPIC = 'homeassistant/sensor/{}/config'
 MQTT_SENSOR_TOPIC = 'homeassistant/sensor/{}/state'
 MAX_RETRIES = 5  # Number of retries before failing
 
+
+import captive
+captive.start()
+
 # GPIO pin where the DS18x20 is connected
 ds_pin = machine.Pin(4)  # Use the correct pin for your setup (D2 on ESP8266 is GPIO4)
 

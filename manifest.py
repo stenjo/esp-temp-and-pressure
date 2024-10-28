@@ -20,19 +20,9 @@ require("upysh")
 
 # micropython-lib: umqtt
 require("umqtt.simple")
-# require("umqtt.robust")
+require("umqtt.robust")
 
 # require("urequests")
 
-package("mrequests", base_path="modules/mrequests")
 module("ads1x15.py",base_path="modules")
-package("slim", base_path="modules/micropython-wifi-setup/lib")
-# package("micro_web_srv_2", base_path="modules/micropython-wifi-setup/lib")
-module("logging.py","modules/micropython-wifi-setup/lib")
-module("micro_dns_srv.py","modules/micropython-wifi-setup/lib")
-module("shim.py","modules/micropython-wifi-setup/lib")
-module("schedule.py","modules/micropython-wifi-setup/lib")
-module("frozen_wifi_setup.py", base_path="modules")
-# module("frozen_slim.py", base_path="modules")
-module("frozen_micro_web_srv_2.py", base_path="modules")
-# package("wifi_setup", base_path="modules/micropython-wifi-setup/lib")
+module("wifi_manager.py", base_path="modules")

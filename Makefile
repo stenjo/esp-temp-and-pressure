@@ -7,8 +7,8 @@
 BOARD ?= ESP8266_GENERIC
 
 # USB port
-# USB ?= /dev/cu.usbserial-10
-USB ?= /dev/cu.usbserial-FTB6SPL3
+USB ?= /dev/cu.usbserial-10
+# USB ?= /dev/cu.usbserial-FTB6SPL3
 
 # Location of MicroPython repository.
 MICROPY_TOP ?= $(abspath lib/micropython)
@@ -73,11 +73,6 @@ prepare:
 
 update:
 	git submodule update --init $(MICROPY_TOP)
-	git submodule update --init $(PROJECT_TOP)/modules/micropython-wifi-setup
-	git submodule update --init $(PROJECT_TOP)/modules/mrequests
-	python3 -m freezefs $(PROJECT_TOP)/modules/micropython-wifi-setup/lib/wifi_setup $(PROJECT_TOP)/modules/frozen_wifi_setup.py -ov always
-	python3 -m freezefs $(PROJECT_TOP)/modules/micropython-wifi-setup/lib/micro_web_srv_2 $(PROJECT_TOP)/modules/frozen_micro_web_srv_2.py -ov always
-	python3 -m freezefs $(PROJECT_TOP)/modules/micropython-wifi-setup/lib/slim $(PROJECT_TOP)/modules/frozen_slim.py -ov always
 
 copy:
 	rshell -p  $(PORT) rsync src /pyboard

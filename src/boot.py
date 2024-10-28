@@ -1,20 +1,19 @@
 # This file is executed on every boot (including wake-boot from deepsleep)
-import frozen_micro_web_srv_2
-# import frozen_slim
-import frozen_wifi_setup
-# import wifi_setup
-import network
+from wifi_manager import WifiManager
 import gc
 
 gc.collect()  # Free up memory
 gc.threshold(gc.mem_free() // 4 + gc.mem_alloc())
 print("free mem:", gc.mem_free())
 
-from wifi_setup.wifi_setup import WiFiSetup
+wm = WifiManager()
 
-ws = WiFiSetup("temp-and-pressure")
-sta = ws.connect_or_setup()
-del ws
+# By default the SSID is WiFiManager and the password is wifimanager.
+# You can customize the SSID and password of the AP for your needs:
+wm = WifiManager(ssid="temp-and-pressure",password="my password")
+
+# Start the connection:
+wm.connect()
 
 gc.collect()  # Free up memory
 print("free mem:", gc.mem_free())

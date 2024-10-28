@@ -173,3 +173,4 @@ log
 src/credentials
 **/dependencies.lock
 locate_untagged.sh
+src/wifi.dat

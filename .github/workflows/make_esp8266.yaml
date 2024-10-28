@@ -48,18 +48,16 @@ jobs:
           make -C ports/${{ inputs.board }} submodules
           
       - name: Compile firmware
-        working-directory: boards/${{ inputs.path }}
         run: |
           echo "${{ env.ESP_ESPRESSIF_ROOT}}/xtensa-lx106-elf/bin" >> $GITHUB_PATH
           /usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc -v
           make CROSS_COMPILE=/usr/lib/espressif/xtensa-lx106-elf/bin/xtensa-lx106-elf-
 
       - name: Check output
-        working-directory: boards/${{ inputs.path }}
         run: ls -al build/firmware.bin
 
       - name: Save binary
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.board }}-binary
-          path: boards/${{ inputs.path }}/build/firmware.bin
+          path: build/firmware.bin

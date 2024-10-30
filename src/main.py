@@ -1,10 +1,12 @@
 import machine
 import onewire
 import ds18x20
+from machine import Pin, I2C, SPI, SoftSPI 
 import time
 import json
 from umqtt.simple import MQTTClient
-from ads1x15 import ADS1115  # Assuming you have the ads1x15 library by Robert H.H.
+# from ads1x15 import ADS1115  # Assuming you have the ads1x15 library by Robert H.H.
+from ads1118 import ADS1118
 
 # Constants
 MQTT_BROKER = '192.168.1.4'  # Replace with your MQTT server address
@@ -14,8 +16,8 @@ MQTT_SENSOR_TOPIC = 'homeassistant/sensor/{}/state'
 MAX_RETRIES = 5  # Number of retries before failing
 
 
-import captive
-captive.start()
+# import captive
+# captive.start()
 
 # GPIO pin where the DS18x20 is connected
 ds_pin = machine.Pin(4)  # Use the correct pin for your setup (D2 on ESP8266 is GPIO4)
@@ -24,8 +26,13 @@ ds_pin = machine.Pin(4)  # Use the correct pin for your setup (D2 on ESP8266 is 
 ds_sensor = ds18x20.DS18X20(onewire.OneWire(ds_pin))
 
 # Setup I2C for BMP280
-i2c = machine.I2C(scl=machine.Pin(5), sda=machine.Pin(4))  # Adjust pins as needed
-ads = ADS1115(i2c)
+# i2c = machine.I2C(scl=machine.Pin(5), sda=machine.Pin(4))  # Adjust pins as needed
+# ads = ADS1115(i2c)
+
+miso =Pin(14, Pin.IN)
+spi = SPI(1, baudrate=1000000, phase=1)
+cs = Pin(15, Pin.OUT, value=1)
+ads = ADS1118(spi, cs, miso)
 
 # Function to connect to MQTT server
 def connect_mqtt():

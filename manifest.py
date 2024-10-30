@@ -24,6 +24,7 @@ require("umqtt.robust")
 
 # require("urequests")
 
-module("ads1x15.py",base_path="modules")
+# module("ads1x15.py",base_path="modules")
+module("ads1118.py",base_path="modules")
 module("wifi_manager.py", base_path="modules")
 module("captive.py", base_path="modules")

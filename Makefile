@@ -7,8 +7,8 @@
 BOARD ?= ESP8266_GENERIC
 
 # USB port
-USB ?= /dev/cu.usbserial-210
-# USB ?= /dev/cu.usbserial-FTB6SPL3
+# USB ?= /dev/cu.usbserial-210
+USB ?= /dev/cu.usbserial-FTB6SPL3
 
 # Location of MicroPython repository.
 MICROPY_TOP ?= $(abspath lib/micropython)

@@ -14,11 +14,11 @@ MQTT_SENSOR_TOPIC = 'homeassistant/sensor/{}/state'
 MAX_RETRIES = 5  # Number of retries before failing
 
 
-import captive
-captive.start()
+# import captive
+# captive.start()
 
 # GPIO pin where the DS18x20 is connected
-ds_pin = machine.Pin(4)  # Use the correct pin for your setup (D2 on ESP8266 is GPIO4)
+ds_pin = machine.Pin(14)  # Use the correct pin for your setup (D2 on ESP8266 is GPIO4)
 
 # Setup OneWire and DS18x20
 ds_sensor = ds18x20.DS18X20(onewire.OneWire(ds_pin))
@@ -50,8 +50,12 @@ def read_temperature():
     ds_sensor.convert_temp()
     time.sleep_ms(750)  # Wait for temperature conversion
     for rom in roms:
-        temp = ds_sensor.read_temp(rom)
-        return temp, rom
+        try:
+            temp = ds_sensor.read_temp(rom)
+            return temp, rom
+        except OSError as e:
+            return None
+
 
 def read_temperature_with_retries():
     retries = 0

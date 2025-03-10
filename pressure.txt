@@ -1,0 +1,13 @@
+'pressure': 6584, =  200 kPa / 2 bar
+
+'pressure': 5570,
+'pressure': 5543, 1.5 bar
+
+'pressure': 4497,
+'pressure': 4447,  1 bar
+
+'pressure': 3447,  0,5 bar
+
+'pressure': 2592,  0 bar
+
+6584-2592

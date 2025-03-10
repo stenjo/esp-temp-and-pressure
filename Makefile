@@ -4,11 +4,11 @@
 # Define your settings here.
 
 # The board name.
-BOARD ?= ESP8266_GENERIC
+BOARD ?= LOLIN_S2_MINI
 
 # USB port
-# USB ?= /dev/cu.usbserial-210
-USB ?= /dev/cu.usbserial-FTB6SPL3
+# USB ?= /dev/cu.usbserial-1410
+USB ?= /dev/cu.usbmodem01
 
 # Location of MicroPython repository.
 MICROPY_TOP ?= $(abspath lib/micropython)
@@ -75,7 +75,17 @@ update:
 	git submodule update --init $(MICROPY_TOP)
 
 copy:
-	rshell -p  $(PORT) rsync src /pyboard
+	rshell -p $(PORT) ls /pyboard/boot.py
+	rshell -p $(PORT) rsync src /pyboard
+	rshell -p $(PORT) cp -r src/boot.py /pyboard
+	sleep 2
+
+copy_main:
+	rshell -p $(PORT) rm /pyboard/boot.py
+	rshell -p $(PORT) cp -r src/main.py /pyboard
+	rshell -p $(PORT) cp -r src/wifi.dat /pyboard
+	rshell -p $(PORT) cp -r src/version.txt /pyboard
+	rshell -p $(PORT) cp -r src/boot.py /pyboard
 	sleep 2
 
 bld:

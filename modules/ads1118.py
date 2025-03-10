@@ -95,37 +95,37 @@ class ADS1118:
         return 'ADS1118('+''.join([s for a in ('mux','vmax','gain','sps') for s in (a,'=',str(dct[a]),', ')][:-1]) + app
 
     def _wr_cfg(self, config): # Write configuration
-        self.cs.low()
+        self.cs.off()
         self.spi.write(config.to_bytes(2, 'big'))
-        self.cs.high()         # CS must go high after writing 2 bytes, otherwise the _DRDY-Logic will not work (SPI expects 2 more bytes)
+        self.cs.on()         # CS must go high after writing 2 bytes, otherwise the _DRDY-Logic will not work (SPI expects 2 more bytes)
         
     def _rd_cfg(self):         # Read configuration
-        self.cs.low()
+        self.cs.off()
         data=self.spi.read(4)                    # We have to read bytes 0..3
-        self.cs.high()
+        self.cs.on()
         return int.from_bytes(data[2:], 'big')   # Bytes 2+3 are the config
 
     def _rd_data(self, config=0):  # Read data, may also write the config simultaneously; config=0 will be ignored by the ADC
-        self.cs.low()
+        self.cs.off()
         rbuf = bytearray(2)
         self.spi.write_readinto(config.to_bytes(2, 'big'), rbuf)
-        self.cs.high()
+        self.cs.on()
         return int.from_bytes(rbuf, 'big')
 
     def _wait_drdy(self):           # Wait for _DRDY = 0, we might evaluate self.sps to determine the max waiting period
         start = ticks_us()
-        self.cs.low()
+        self.cs.off()
         while self.miso.value():    # As long as miso = DOUT/_DRDY = 1 conversion is not finished
             if ticks_diff(ticks_us(), start) > 130000:
                 break
-        self.cs.high()
+        self.cs.on()
         return ticks_diff(ticks_us(), start)    # if the result is >= 100000 then miso was never low -> data weren't ready
 
     def config(self, mux=None, vmax=None, gain=None, sps=None, temp=None):
         """Get / set conversion mode."""
         if mux is None and vmax is None and gain is None and sps is None and temp is None:
-#             if self._rd_cfg() != self._config | 0x0001:
-#                 print('Warning: ads1118 not configured accordingly.')
+            if self._rd_cfg() != self._config | 0x0001:
+                print('Warning: ads1118 not configured accordingly.', f"{self._rd_cfg():016b}")
             return {
                 "mux": _MUX_T[self._config>>12 & 0x07],
                 "vmax": 4.096 / self.gain,

@@ -1,5 +1,5 @@
 # include default manifest
-# include("$(PORT_DIR)/boards/manifest.py")
+# include("$(PORT_DIR)/manifest.py")
 freeze("$(PORT_DIR)/modules")
 require("bundle-networking")
 # require("dht")

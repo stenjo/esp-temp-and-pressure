@@ -101,6 +101,10 @@ You can also do both the above steps this via make file:
 make copy mon
 ```
 
+```bash
+make BOARD=LOLIN_S2_MINI PORT=/dev/tty.usbmodem01 -C lib/micropython/ports/esp32 FROZEN_MANIFEST=/Users/sten/git/temp-and-pressure-sensor/manifest.py  all deploy
+```
+
 ### Build binary
 
 ## Dependencies

@@ -1,0 +1,36 @@
+{
+    "cmps": {
+        "Kaffemaskin Pressure Sensor 28f59": {
+            "value_template": "{{ value_json.pressure}}",
+            "unique_id": "28f59_pressure",
+            "device_class": "pressure",
+            "unit_of_measurement": "bar",
+            "p": "sensor"
+        },
+        "Kaffemaskin Temperature Sensor 28f59": {
+            "value_template": "{{ value_json.temperature}}",
+            "unique_id": "28f59_temperature",
+            "device_class": "temperature",
+            "unit_of_measurement": "°C",
+            "p": "sensor"
+        }
+    },
+    "state_topic": "wega/state",
+    "qos": 2,
+    "o": {
+        "name": "kaffemaskin_temperature_pressure_sensor",
+        "sw": "v0.0.1\n",
+        "url": "https://github.com/stenjo/esp-temp-and-pressure"
+    },
+    "dev": {
+        "name": "Kaffemaskin Sensor Device",
+        "sw": "v0.0.1\n",
+        "hw": "1.0rev2",
+        "manufacturer": "Wega",
+        "sn": "ea334450945afc",
+        "identifiers": [
+            "28f59"
+        ],
+        "model": "Polaris"
+    }
+}

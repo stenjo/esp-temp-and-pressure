@@ -61,8 +61,14 @@
         "ctime": "c"
     },
     "cmake.configureOnOpen": false,
-    "idf.port": "/dev/cu.usbmodem1234561",
-    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
-    "C_Cpp.default.compileCommands": "/Users/sten.johnsen/git/dot-matrix-calendar/cmodules/ics/builddir/compile_commands.json",
-    "unityExplorer.unitUnderTestFolder": "./test"
+    "idf.port": "/dev/tty.usbmodem01",
+    "idf.customExtraVars": {
+        "OPENOCD_SCRIPTS": "/Users/sten/.espressif/tools/openocd-esp32/v0.12.0-esp32-20230921/openocd-esp32/share/openocd/scripts",
+        "ESP_ROM_ELF_DIR": "/Users/sten/.espressif/tools/esp-rom-elfs/20230320/",
+        "IDF_TARGET": "esp32s2"
+    },
+    "idf.openOcdConfigs": [
+        "board/esp32s2-bridge.cfg"
+    ],
+    "idf.flashType": "UART"
 }

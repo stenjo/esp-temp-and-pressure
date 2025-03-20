@@ -20,6 +20,7 @@ jobs:
         
     - name: Update repos
       run: |
+        git submodule update --init lib/micropython
         make prepare
         
     - name: Make submodules    

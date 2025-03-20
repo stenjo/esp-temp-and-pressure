@@ -8,8 +8,8 @@ from umqtt.simple import MQTTClient
 from ads1x15 import ADS1115  # Assuming you have the ads1x15 library by Robert H.H.
 import ssd1306
 # import lcd_i2c
-from machine import SoftI2C    # Import the machine module
-from machine_i2c_lcd import I2cLcd
+# from machine import SoftI2C    # Import the machine module
+# from machine_i2c_lcd import I2cLcd
 from time import sleep
 
 
@@ -49,11 +49,11 @@ I2C_ADDR = 0x27
 I2C_NUM_ROWS = 2
 I2C_NUM_COLS = 16
 
-i2c = SoftI2C(sda=Pin(33), scl=Pin(35), freq=400000)  # Create the I2C interface
-lcd = I2cLcd(i2c, I2C_ADDR, I2C_NUM_ROWS, I2C_NUM_COLS)
+# i2c = SoftI2C(sda=Pin(33), scl=Pin(35), freq=400000)  # Create the I2C interface
+# lcd = I2cLcd(i2c, I2C_ADDR, I2C_NUM_ROWS, I2C_NUM_COLS)
 
-lcd.putstr("It's working :)")
-lcd.backlight_on()
+# lcd.putstr("It's working :)")
+# lcd.backlight_on()
 
 # Setup OneWire and DS18x20
 ds_pin = machine.Pin(4)  # Use the correct pin for your setup (D2 on ESP8266 is GPIO4)
@@ -268,7 +268,7 @@ def main():
                 bar = None
             if temp is not None or pressure is not None:
                 if pressure is not None: 
-                    bar = round((pressure - 4212)/2000, 1)
+                    bar = round((pressure - 4200)/3100, 1)
                 else:
                     bar = None
 
@@ -276,8 +276,8 @@ def main():
                     temp = round(temp, 2)
                 client = publish_sensor_data(client, unique_id, temp, bar, pressure)
 
-                lcd.clear()
-                lcd.putstr("Temp: {} °C".format(temp))
+                # lcd.move_to(0, 0)
+                # lcd.putstr("Temp: {} °C".format(temp))
 
             time.sleep(5)  # Sleep for a short interval to avoid busy-waiting
             watchdog.feed()

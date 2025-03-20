@@ -40,6 +40,8 @@ monitor:
 size:
 	$(MAKE) -C $(PORT_DIR) BOARD=$(BOARD) FROZEN_MANIFEST=$(FROZEN_MANIFEST) size
 
+test:
+	$(MAKE) -C $(PORT_DIR) BOARD=$(BOARD) test
 
 reset:
 	rshell -p $(REPL) "repl ~ import machine ~ machine.reset() ~"

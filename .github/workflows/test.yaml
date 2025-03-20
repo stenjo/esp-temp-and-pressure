@@ -20,9 +20,7 @@ jobs:
         
     - name: Update repos
       run: |
-        git submodule update --init lib/micropython
-        git submodule update --init modules/micropython-wifi-setup
-        make -C lib/micropython/mpy-cross
+        make prepare
         
     - name: Make submodules    
       working-directory: lib/micropython/ports/unix
@@ -30,13 +28,13 @@ jobs:
         make submodules
         make
       
-    - name: Make frozen extractable files    
-      working-directory: modules
-      run: |
-        git submodule update --init micropython-wifi-setup
-        git submodule update --init mrequests
-        python -m freezefs micropython-wifi-setup/lib/wifi_setup frozen_wifi_setup.py -ov always
-        python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
+    # - name: Make frozen extractable files    
+    #   working-directory: modules
+    #   run: |
+    #     git submodule update --init micropython-wifi-setup
+    #     git submodule update --init mrequests
+    #     python -m freezefs micropython-wifi-setup/lib/wifi_setup frozen_wifi_setup.py -ov always
+    #     python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
 
         
     - name: Compile firmware

@@ -40,7 +40,7 @@ jobs:
         
     - name: Compile firmware
       run: |
-        make all BOARD=UNIX
+        make all BOARD=UNIX PORT_DIR=lib/micropython/ports/unix
    
     - name: Check output
       run: ls -al build/*

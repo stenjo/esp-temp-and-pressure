@@ -1,72 +1,54 @@
-# Makefile for custom MicroPython esp8266 board.
-
 ################################################################################
 # Define your settings here.
 
 # The board name.
 BOARD ?= LOLIN_S2_MINI
 
-# USB port
-# USB ?= /dev/cu.usbserial-1410
-USB ?= /dev/cu.usbmodem01
-
-# Location of MicroPython repository.
 MICROPY_TOP ?= $(abspath lib/micropython)
-PORT_DIR ?= $(abspath $(MICROPY_TOP)/ports/esp8266) 
+PORT_DIR ?= $(abspath $(MICROPY_TOP)/ports/esp32) 
+FROZEN_MANIFEST ?= $(abspath manifest.py)
+# FROZEN_MANIFEST = /Users/sten/git/temp-and-pressure-sensor/manifest.py
 
-# FROZEN_MANIFEST?=$(PORT_DIR)/boards/$(BOARD)/manifest_512kiB.py
-FROZEN_MANIFEST?=$(abspath manifest.py)
-
-PROJECT_TOP?=$(abspath .)
-
-################################################################################
-# Define your targets here.
-
-all: firmware
-
-################################################################################
-# Items below this line do not generally need to be changed.
-BOARD_DIR = $(abspath $(MICROPY_TOP)/ports/esp8266/boards/$(BOARD))
-BUILD = $(abspath build)
-FWBIN = $(BUILD)/firmware.bin
-PORT ?= $(USB)
+# Define variables 
+PORT = /dev/tty.usbmodem01
+USB ?= /dev/cu.usbmodem01
+REPL ?= /dev/tty.usbmodem14201
 BAUD ?= 115200
-FLASH_MODE ?= dio
-FLASH_SIZE ?= detect
+
 PYTHON ?= python3
-USER_C_MODULES ?= $(abspath cmodules/micropython.cmake)
-# USER_C_MODULES ?= $(abspath lib/micropython/examples/usercmodule/cexample/micropython.cmake)
 
-include $(MICROPY_TOP)/py/mkenv.mk
-include $(MICROPY_TOP)/py/mkrules.mk
+# Default target
+all: deploy
 
-firmware:
-	$(Q)$(MAKE) -j -C $(MICROPY_TOP)/ports/esp8266 \
-		PROJECT_TOP=$(abspath .) \
-		BOARD=$(BOARD) \
-		BOARD_DIR=$(BOARD_DIR) \
-		BUILD=$(BUILD) \
-		USER_C_MODULES=$(USER_C_MODULES) \
-		FROZEN_MANIFEST=$(FROZEN_MANIFEST)
+# Clean rule
+clean:
+	$(MAKE) -C $(PORT_DIR) BOARD=$(BOARD) FROZEN_MANIFEST=$(FROZEN_MANIFEST) clean
 
-deploy: $(FWBIN)
-	$(ECHO) "Writing $< to the board"
-	$(Q)esptool.py --port $(PORT) --baud 1000000 write_flash --flash_size=4MB -fm dio 0 $<
+# Deploy rule
+deploy:
+	$(MAKE) -C $(PORT_DIR) BOARD=$(BOARD) PORT=$(PORT) FROZEN_MANIFEST=$(FROZEN_MANIFEST) deploy
 
-# $(Q)esptool.py --chip esp8266 --port $(PORT) --baud $(BAUD) write_flash --verify --flash_size=$(FLASH_SIZE) --flash_mode=$(FLASH_MODE) 0 $<
+# Erase rule
 erase:
-	$(ECHO) "Erase flash"
-	$(Q)esptool.py --port $(PORT) --baud $(BAUD) erase_flash
+	$(MAKE) -C $(PORT_DIR) BOARD=$(BOARD) PORT=$(PORT) FROZEN_MANIFEST=$(FROZEN_MANIFEST) erase
+
+# Monitor rule
+monitor:
+	$(MAKE) -C $(PORT_DIR) BOARD=$(BOARD) PORT=$(PORT) FROZEN_MANIFEST=$(FROZEN_MANIFEST) monitor
+
+# Size rule
+size:
+	$(MAKE) -C $(PORT_DIR) BOARD=$(BOARD) FROZEN_MANIFEST=$(FROZEN_MANIFEST) size
+
 
 reset:
-	rshell -p $(PORT) "repl ~ import machine ~ machine.reset() ~"
+	rshell -p $(REPL) "repl ~ import machine ~ machine.reset() ~"
 	sleep 2
 
 mon:
-	picocom $(USB) --b $(BAUD)
+	picocom $(REPL) --b $(BAUD)
 
 prepare:
-	$(ECHO) "Preparing submodules and frozen files"
 	$(Q)$(MAKE) -C $(MICROPY_TOP)/mpy-cross
 	$(Q)$(MAKE) -C $(MICROPY_TOP)/ports/unix submodules
 	$(Q)$(MAKE) -C $(MICROPY_TOP)/ports/esp8266 submodules
@@ -75,19 +57,15 @@ update:
 	git submodule update --init $(MICROPY_TOP)
 
 copy:
-	rshell -p $(PORT) ls /pyboard/boot.py
-	rshell -p $(PORT) rsync src /pyboard
-	rshell -p $(PORT) cp -r src/boot.py /pyboard
+	rshell -p $(REPL) rm /pyboard/boot.py
+	rshell -p $(REPL) rsync src /pyboard
+	rshell -p $(REPL) cp -r src/boot.py /pyboard
 	sleep 2
 
 copy_main:
-	rshell -p $(PORT) rm /pyboard/boot.py
-	rshell -p $(PORT) cp -r src/main.py /pyboard
-	rshell -p $(PORT) cp -r src/wifi.dat /pyboard
-	rshell -p $(PORT) cp -r src/version.txt /pyboard
-	rshell -p $(PORT) cp -r src/boot.py /pyboard
+	rshell -p $(REPL) rm /pyboard/boot.py
+	rshell -p $(REPL) cp -r src/main.py /pyboard
+	rshell -p $(REPL) cp -r src/wifi.dat /pyboard
+	rshell -p $(REPL) cp -r src/version.txt /pyboard
+	rshell -p $(REPL) cp -r src/boot.py /pyboard
 	sleep 2
-
-bld:
-	docker run --rm -v $HOME:$HOME -u $UID -w $PWD larsks/esp-open-sdk make PYTHON=python3
-

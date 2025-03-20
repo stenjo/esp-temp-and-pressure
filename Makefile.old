@@ -1,0 +1,93 @@
+# Makefile for custom MicroPython esp8266 board.
+
+################################################################################
+# Define your settings here.
+
+# The board name.
+BOARD ?= LOLIN_S2_MINI
+
+# USB port
+# USB ?= /dev/cu.usbserial-1410
+USB ?= /dev/cu.usbmodem01
+REPL ?= /dev/tty.usbmodem14201
+
+# Location of MicroPython repository.
+MICROPY_TOP ?= $(abspath lib/micropython)
+PORT_DIR ?= $(abspath $(MICROPY_TOP)/ports/esp32) 
+
+# FROZEN_MANIFEST?=$(PORT_DIR)/boards/$(BOARD)/manifest_512kiB.py
+FROZEN_MANIFEST?=$(abspath manifest.py)
+
+PROJECT_TOP?=$(abspath .)
+
+################################################################################
+# Define your targets here.
+
+all: $(FWBIN)
+
+################################################################################
+# Items below this line do not generally need to be changed.
+BUILD = $(abspath build)
+FWBIN = $(BUILD)/firmware.bin
+BAUD ?= 115200
+# FLASH_MODE ?= dio
+# FLASH_SIZE ?= detect
+PYTHON ?= python3
+# USER_C_MODULES ?= $(abspath cmodules/micropython.cmake)
+# USER_C_MODULES ?= $(abspath lib/micropython/examples/usercmodule/cexample/micropython.cmake)
+
+# include $(MICROPY_TOP)/py/mkenv.mk
+# include $(MICROPY_TOP)/py/mkrules.mk
+
+$(FMBIN):$(Q)$(MAKE) -C $(PORT_DIR) \
+		BOARD=$(BOARD) \
+		BUILD=$(BUILD) \
+		FROZEN_MANIFEST=$(FROZEN_MANIFEST)
+
+deploy: $(FWBIN)
+	$(Q)$(MAKE) -C $(PORT_DIR) \
+		BOARD=$(BOARD) \
+		BUILD=$(BUILD) \
+		FROZEN_MANIFEST=$(FROZEN_MANIFEST) deploy
+
+# $(Q)esptool.py --chip esp8266 --port $(REPL) --baud $(BAUD) write_flash --verify --flash_size=$(FLASH_SIZE) --flash_mode=$(FLASH_MODE) 0 $<
+erase:
+	$(Q)$(MAKE) -C  $(PORT_DIR) BOARD=$(BOARD) BUILD=$(BUILD) FROZEN_MANIFEST=$(FROZEN_MANIFEST) erase
+
+clean:
+	$(Q)$(MAKE) -C $(PORT_DIR) BOARD=$(BOARD) BUILD=$(BUILD) clean
+
+# $(Q)esptool.py --port $(REPL) --baud $(BAUD) erase_flash
+
+reset:
+	rshell -p $(REPL) "repl ~ import machine ~ machine.reset() ~"
+	sleep 2
+
+mon:
+	picocom $(REPL) --b $(BAUD)
+
+prepare:
+	$(Q)$(MAKE) -C $(MICROPY_TOP)/mpy-cross
+	$(Q)$(MAKE) -C $(MICROPY_TOP)/ports/unix submodules
+	$(Q)$(MAKE) -C $(MICROPY_TOP)/ports/esp8266 submodules
+
+update:
+	git submodule update --init $(MICROPY_TOP)
+
+copy:
+	rshell -p $(REPL) rm /pyboard/boot.py
+	rshell -p $(REPL) rsync src /pyboard
+	rshell -p $(REPL) cp -r src/boot.py /pyboard
+	sleep 2
+
+copy_main:
+	rshell -p $(REPL) rm /pyboard/boot.py
+	rshell -p $(REPL) cp -r src/main.py /pyboard
+	rshell -p $(REPL) cp -r src/wifi.dat /pyboard
+	rshell -p $(REPL) cp -r src/version.txt /pyboard
+	rshell -p $(REPL) cp -r src/boot.py /pyboard
+	sleep 2
+
+bld:
+	docker run --rm -v $HOME:$HOME -u $UID -w $PWD larsks/esp-open-sdk make PYTHON=python3
+

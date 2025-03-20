@@ -1,6 +1,10 @@
 # This file is executed on every boot (including wake-boot from deepsleep)
 from wifi_manager import WifiManager
 import gc
+import machine
+
+# watchdog = machine.WDT(timeout=30000)  # Set the watchdog timer to 30 seconds
+
 
 gc.collect()  # Free up memory
 gc.threshold(gc.mem_free() // 4 + gc.mem_alloc())

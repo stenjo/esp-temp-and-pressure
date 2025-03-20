@@ -8,13 +8,16 @@ from umqtt.simple import MQTTClient
 from ads1x15 import ADS1115  # Assuming you have the ads1x15 library by Robert H.H.
 import ssd1306
 # import lcd_i2c
+from machine import SoftI2C    # Import the machine module
+from machine_i2c_lcd import I2cLcd
+from time import sleep
 
 
 # Constants
 MQTT_BROKER = '192.168.1.4'  # Replace with your MQTT server address
 MQTT_CLIENT_ID = 'kaffemaskin_temperature_pressure_sensor'
 # MQTT_DISCOVERY_TOPIC = 'homeassistant/sensor/coffeemaker-monitor/{}/config'
-MQTT_SENSOR_TOPIC = 'wega/{}/{}'
+MQTT_SENSOR_TOPIC = 'wega/{}/state'
 MQTT_CMD_TOPIC = 'wega/cmd'
 MAX_RETRIES = 5  # Number of retries before failing
 #<discovery_prefix>/<component>/[<node_id>/]<object_id>/config
@@ -40,6 +43,18 @@ NUM_COLS = 16
 # 15 SPI sck
 # 16 WAKEUP SPI rst
 
+
+# Define the LCD I2C address and dimensions
+I2C_ADDR = 0x27
+I2C_NUM_ROWS = 2
+I2C_NUM_COLS = 16
+
+i2c = SoftI2C(sda=Pin(33), scl=Pin(35), freq=400000)  # Create the I2C interface
+lcd = I2cLcd(i2c, I2C_ADDR, I2C_NUM_ROWS, I2C_NUM_COLS)
+
+lcd.putstr("It's working :)")
+lcd.backlight_on()
+
 # Setup OneWire and DS18x20
 ds_pin = machine.Pin(4)  # Use the correct pin for your setup (D2 on ESP8266 is GPIO4)
 ds_sensor = ds18x20.DS18X20(onewire.OneWire(ds_pin))
@@ -58,7 +73,7 @@ dc = Pin(5, Pin.OUT)   # data/command
 rst = Pin(16, Pin.OUT)  # reset
 cs = Pin(2, Pin.OUT)  # chip select, some modules do not have a pin for this
 
-print(ads)
+# print(ads)
 
 
 # Function to connect to MQTT server
@@ -69,6 +84,7 @@ def connect_mqtt(unique_id):
     client.set_callback(mqtt_callback)
     while True:
         try:
+            print('Connecting to MQTT broker...')
             client.connect()
             print('Connected to MQTT broker')
             
@@ -113,6 +129,9 @@ def read_temperature_with_retries():
             return temp, rom
         retries += 1
         time.sleep(1)
+        print('Failed to read temperature sensor. retrying...', retries)
+
+    print('Failed to read temperature sensor after multiple retries')
     return None, None
 
 # Function to read pressure from ADS1115 sensor
@@ -134,93 +153,43 @@ def publish_discovery_payload(client, unique_id, version):
     if client is None or unique_id is None:
         return
 
-    # Common device information for Home Assistant discovery
-    temp_cfg = {
-        "state_topic": MQTT_SENSOR_TOPIC.format(unique_id, "temperature"),
-        "icon": "hass:thermometer",
-        "name": "Boiler Temperature",
-        "unique_id": f"wega_{unique_id}_temperature",
-        "device": {
-            "identifiers": [
-                f"coffeemaker_{unique_id}"
-            ],
-            "manufacturer": "Wega",
-            "model": "Polaris",
-            "name": "coffeemaker",
-            "sw": version,
-        },
-        "unit_of_measurement": "°C",
-        "device_class": "temperature",
-        "state_class": "measurement"
-    }
-
-    press_cfg = {
-        "state_topic": MQTT_SENSOR_TOPIC.format(unique_id, "pressure"),
-        "icon": "hass:gauge",
-        "name": "Boiler Pressure",
-        "unique_id": f"wega_{unique_id}_pressure",
-        "device": {
-            "identifiers": [
-                f"coffeemaker_{unique_id}"
-            ],
-            "manufacturer": "Wega",
-            "model": "Polaris",
-            "name": "coffeemaker",
-            "sw": version,
-        },
-        "unit_of_measurement": "bar",
-        "device_class": "pressure",
-        "state_class": "measurement"
-    }
-
     cfg = {
         "device": {
-            "ids": {unique_id},
+            "identifiers": f"wega_{unique_id}",
             "name": "Coffeemachine",
-            "mf": "Wega",
-            "mdl": "Polaris",
-            "sw": version,
+            "manufacturer": "Wega",
+            "model": "Polaris",
+            "sw_version": version,
         },
         "origin": {
             "name":"esp-temp-and-pressure",
             "sw": version,
-            "url": "https://github.com/stenjo/esp-temp-and-pressure"
+            "url": "https://github.com/stenjo/esp-temp-and-pressure",
         },
         "components": {
             "boiler_temperature": {
                 "platform": "sensor",
                 "device_class":"temperature",
-                "unit_of_measurement":"°C",
+                # "unit_of_measurement":"°C",
                 "value_template":"{{ value_json.temperature}}",
-                "unique_id":f"wega_{unique_id}_t"
+                "unique_id":f"wega_{unique_id}_t",
             },
             "boiler_pressure": {
                 "platform": "sensor",
                 "device_class":"pressure",
                 "unit_of_measurement":"bar",
                 "value_template":"{{ value_json.pressure}}",
-                "unique_id":f"wega_{unique_id}_p"
+                "unique_id":f"wega_{unique_id}_p",
             }
         },
-        "state_topic":"wega/state",
-        "qos": 2
+        "state_topic":MQTT_SENSOR_TOPIC.format(unique_id),
+        "qos": 2,
     }
 
     DISCOVERY_TOPIC = 'homeassistant/device/wega_{}/config'
 
 
     try:
-
-        # Convert to JSON string
-        temp_payload_str = json.dumps(temp_cfg)
-        # print("Discovery Payload Temp JSON:", temp_payload_str)
-        # client.publish(MQTT_DISCOVERY_TOPIC.format(unique_id, "temperature"), temp_cfg, retain=True)
-
-        press_payload_str = json.dumps(press_cfg)
-        # Debug: Print JSON string to confirm structure
-        # print("Discovery Payload Press JSON:", press_payload_str)
-        # client.publish(MQTT_DISCOVERY_TOPIC.format(unique_id, "pressure"), press_cfg, retain=True)
-
         # Publish the discovery payload
         discovery_payload_str = json.dumps(cfg)
         print("Discovery Config Payload JSON:", discovery_payload_str)
@@ -232,17 +201,46 @@ def publish_discovery_payload(client, unique_id, version):
     except OSError as e:
         print(f"JSON encoding error: {e}")
 
+
+def publish_sensor_data(client, unique_id, temp, pressure, raw):
+    try:
+        topic = MQTT_SENSOR_TOPIC.format(unique_id)
+        state = {}
+        if temp is not None: 
+            state["temperature"] = temp
+        if pressure is not None: 
+            state["pressure"] = pressure
+            state["raw"] = raw
+        client.publish(topic, json.dumps(state))
+        print('Published sensor data:', topic,  state)
+
+    except OSError as e:
+        print('Failed to publish sensor data. Reconnecting...', e)
+        client = None
+    
+    return client
+
 # Main function
 def main():
-    temp, rom = read_temperature_with_retries()
+    booting = True
+    watchdog = machine.WDT(timeout=30000)  # Set the watchdog timer to 30 seconds
+    try:
+        temp, rom = read_temperature_with_retries()
+        print("Temp sensor: ", ''.join('{:02x}'.format(x) for x in rom))
+    except IOError as e:
+        print("Failed reading temp sensor:", e)
+
     pressure = 0
     client = None
     if rom is not None:
         unique_id = ''.join('{:02x}'.format(x) for x in rom)[:5]
-    
+        print("Unique ID: ", unique_id)
+
         try:
+            print("Connecting to MQTT broker...")
             client = connect_mqtt(unique_id)
             publish_discovery_payload(client, unique_id, version)
+            print("Connected to MQTT broker")
         except ConnectionError as e:
             print("Failed connecting: ", e)
 
@@ -251,63 +249,41 @@ def main():
             if not client:
                 try:
                     client = connect_mqtt(unique_id)
-                    if pressure == 0:
+                    if booting == True:
                         publish_discovery_payload(client, unique_id, version)
+                        booting = False
                 except ConnectionError as e:
                     print("Failed connecting: ", e)
 
-
             try:
                 temp, _ = read_temperature_with_retries()
-            except IOError as e:
+            except OSError as e:
                 print("Failed reading sensors:", e)
             
-            value_type = None
-            sensor_value = None
-
-            if temp is not None:
-                sensor_value = round(temp,1)
-                value_type = "temperature"
             try:
-                topic = MQTT_SENSOR_TOPIC.format(unique_id, value_type);
-                client.publish(topic, f"{sensor_value}")
-                print('Published sensor data:', topic, f"{sensor_value}")
-
+                pressure = read_pressure()
             except OSError as e:
-                print('Failed to publish sensor data. Reconnecting...', e)
-                client = None
-                continue
+                print("Failed reading pressure sensor:", e)
+                pressure = None
+                bar = None
+            if temp is not None or pressure is not None:
+                if pressure is not None: 
+                    bar = round((pressure - 4212)/2000, 1)
+                else:
+                    bar = None
 
-            # Limit wait_msg to 5 seconds
-            start_time = time.time()
-            while time.time() - start_time < 5:
-                # client.check_msg()  # Check for a message and call the callback function if a message is received
-                time.sleep(0.5)  # Sleep for a short interval to avoid busy-waiting
+                if temp is not None: 
+                    temp = round(temp, 2)
+                client = publish_sensor_data(client, unique_id, temp, bar, pressure)
 
-            try:
-                pressure = round((read_pressure() - 2600)/2000, 2)
-            except OSError as e:
-                print("Failed reading sensors:", e)
+                lcd.clear()
+                lcd.putstr("Temp: {} °C".format(temp))
 
-            if pressure is not None:
-                sensor_value = pressure
-                value_type = "pressure"
-            try:
-                topic = MQTT_SENSOR_TOPIC.format(unique_id[:5], value_type)
-                client.publish(topic, f"{sensor_value}")
-                print('Published sensor data:', topic,  f"{sensor_value}")
-
-            except OSError as e:
-                print('Failed to publish sensor data. Reconnecting...', e)
-                client = None
-                continue
-        
-            # Limit wait_msg to 5 seconds
-            start_time = time.time()
-            while time.time() - start_time < 5:
-                # client.check_msg()  # Check for a message and call the callback function if a message is received
-                time.sleep(0.5)  # Sleep for a short interval to avoid busy-waiting
-
+            time.sleep(5)  # Sleep for a short interval to avoid busy-waiting
+            watchdog.feed()
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nControl-C pressed. Cleaning up and exiting.")

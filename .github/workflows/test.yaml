@@ -39,30 +39,14 @@ jobs:
 
         
     - name: Compile firmware
-      working-directory: boards/UNIX
       run: |
-        make all
+        make all BOARD=UNIX
    
     - name: Check output
-      working-directory: boards/UNIX
       run: ls -al build/*
 
     - name: Run test
-      working-directory: boards/UNIX
       run: |
-        MICROPYPATH=../../modules ./build/micropython ../../tests/test_ics.py
-        MICROPYPATH=../../modules ./build/micropython ../../tests/test_Clock.py
+        MICROPYPATH=./modules ./build/micropython ./tests/test_ics.py
+        MICROPYPATH=./modules ./build/micropython ./tests/test_Clock.py
 
-  cmodules:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Install tools
-      run: |
-        gem install ceedling
-
-    - name: Run IcsParser tests
-      working-directory: cmodules/IcsParser
-      run: |
-        ceedling

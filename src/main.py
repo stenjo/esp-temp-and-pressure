@@ -203,7 +203,7 @@ def publish_sensor_data(client, unique_id, temp, pressure, raw):
 # Main function
 def main():
     booting = True
-    watchdog = machine.WDT(timeout=30000)  # Set the watchdog timer to 30 seconds
+    watchdog = machine.WDT(timeout=60000)  # Set the watchdog timer to 60 seconds
     try:
         temp, rom = read_temperature_with_retries()
         print("Temp sensor: ", ''.join('{:02x}'.format(x) for x in rom))
@@ -267,6 +267,7 @@ def main():
 
 def check_update():
     
+    lines = []
     try:
         with open("update.dat") as file:
             lines = file.readlines()

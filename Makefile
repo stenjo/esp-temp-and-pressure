@@ -32,6 +32,7 @@ deploy:
 # Erase rule
 erase:
 	$(MAKE) -C $(PORT_DIR) BOARD=$(BOARD) PORT=$(PORT) FROZEN_MANIFEST=$(FROZEN_MANIFEST) erase
+	sleep 2
 
 # Monitor rule
 monitor:

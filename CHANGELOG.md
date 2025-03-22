@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/stenjo/esp-temp-and-pressure/compare/v1.0.3...v1.0.4) (2025-03-22)
+
+
+### Bug Fixes
+
+* **ota:** refactor ota update ([f7058f6](https://github.com/stenjo/esp-temp-and-pressure/commit/f7058f614af73f248f0dd00873a729cd91cb2e5e))
+
 ## [1.0.3](https://github.com/stenjo/esp-temp-and-pressure/compare/v1.0.2...v1.0.3) (2025-03-22)
 
 

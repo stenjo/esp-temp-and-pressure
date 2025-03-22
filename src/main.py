@@ -7,6 +7,7 @@ from machine import Pin, I2C, SoftSPI
 from umqtt.simple import MQTTClient
 from ads1x15 import ADS1115  # Assuming you have the ads1x15 library by Robert H.H.
 import micropython_ota
+from creds import get_creds
 
 # Constants
 MQTT_BROKER = '192.168.1.4'  # Replace with your MQTT server address
@@ -124,7 +125,7 @@ def read_pressure():
         print('Failed to read pressure sensor')
         return None
 
-with open("version.txt", "r") as file:
+with open("version", "r") as file:
     version = file.read().strip()
 
 print(version)
@@ -261,28 +262,18 @@ def main():
 
             time.sleep(5)  # Sleep for a short interval to avoid busy-waiting
             watchdog.feed()
-            check_update()
+            user, passwrd = get_creds()
+            micropython_ota.check_for_ota_update(
+                        host='http://192.168.1.2:8000',
+                        project='esp-temp-and-pressure',
+                        user=user,
+                        passwd=passwrd
+                    )
             time.sleep(5) 
             watchdog.feed()
 
-def check_update():
-    
-    lines = []
-    try:
-        with open("update.dat") as file:
-            lines = file.readlines()
-    except Exception as error:
-        print(error)
-        pass
 
-    password = lines[0].strip()
 
-    micropython_ota.check_for_ota_update(
-                host='http://192.168.1.2:8000',
-                project='esp-temp-and-pressure',
-                user='admin',
-                passwd=password
-            )
 
 if __name__ == "__main__":
     try:

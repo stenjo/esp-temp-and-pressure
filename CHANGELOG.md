@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2](https://github.com/stenjo/esp-temp-and-pressure/compare/v1.0.1...v1.0.2) (2025-03-22)
+
+
+### Bug Fixes
+
+* **ota:** rebooting repeatedly ([f80285e](https://github.com/stenjo/esp-temp-and-pressure/commit/f80285eec6d17a9481677b3c2e13e3dea06d3644))
+* **ota:** rebooting repeatedly ([3828978](https://github.com/stenjo/esp-temp-and-pressure/commit/3828978803a6dd9c8c27112cfa9613e7c8531fe3))
+
 ## [1.0.1](https://github.com/stenjo/esp-temp-and-pressure/compare/v1.0.0...v1.0.1) (2025-03-22)
 
 

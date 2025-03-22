@@ -22,6 +22,7 @@ all: deploy
 
 # Clean rule
 clean:
+	rm /Users/sten/git/temp-and-pressure-sensor/lib/micropython/ports/esp32/managed_components/espressif__tinyusb/.component_hash
 	$(MAKE) -C $(PORT_DIR) BOARD=$(BOARD) FROZEN_MANIFEST=$(FROZEN_MANIFEST) clean
 
 # Deploy rule

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/stenjo/esp-temp-and-pressure/compare/v1.0.0...v1.0.1) (2025-03-22)
+
+
+### Bug Fixes
+
+* **test:** python tests not working ([8522960](https://github.com/stenjo/esp-temp-and-pressure/commit/8522960b447064c7f4d3bef73bee519c5c4a78d5))
+
 ## 1.0.0 (2025-03-20)
 
 

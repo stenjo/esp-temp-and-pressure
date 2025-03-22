@@ -277,11 +277,9 @@ def check_update():
 
     password = lines[0].strip()
 
-    micropython_ota.ota_update(
+    micropython_ota.check_for_ota_update(
                 host='http://192.168.1.2:8000',
                 project='esp-temp-and-pressure',
-                filenames=['boot.py', 'main.py'],
-                use_version_prefix=False,
                 user='admin',
                 passwd=password
             )

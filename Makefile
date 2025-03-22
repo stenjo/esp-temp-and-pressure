@@ -22,7 +22,7 @@ all: deploy
 
 # Clean rule
 clean:
-	rm /Users/sten/git/temp-and-pressure-sensor/lib/micropython/ports/esp32/managed_components/espressif__tinyusb/.component_hash
+	# rm /Users/sten/git/temp-and-pressure-sensor/lib/micropython/ports/esp32/managed_components/espressif__tinyusb/.component_hash
 	$(MAKE) -C $(PORT_DIR) BOARD=$(BOARD) FROZEN_MANIFEST=$(FROZEN_MANIFEST) clean
 
 # Deploy rule
@@ -31,8 +31,10 @@ deploy:
 
 # Erase rule
 erase:
-	$(MAKE) -C $(PORT_DIR) BOARD=$(BOARD) PORT=$(PORT) FROZEN_MANIFEST=$(FROZEN_MANIFEST) erase
+	esptool.py -p $(PORT) -b 460800 --before default_reset --after no_reset --chip esp32s2 erase_flash
 	sleep 2
+
+# $(MAKE) -C $(PORT_DIR) BOARD=$(BOARD) PORT=$(PORT) FROZEN_MANIFEST=$(FROZEN_MANIFEST) erase -- --after no_reset
 
 # Monitor rule
 monitor:
@@ -70,6 +72,7 @@ copy_main:
 	rshell -p $(REPL) rm /pyboard/boot.py
 	rshell -p $(REPL) cp -r src/main.py /pyboard
 	rshell -p $(REPL) cp -r src/wifi.dat /pyboard
+	rshell -p $(REPL) cp -r src/update.dat /pyboard
 	rshell -p $(REPL) cp -r src/version.txt /pyboard
 	rshell -p $(REPL) cp -r src/boot.py /pyboard
 	sleep 2

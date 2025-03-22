@@ -1,17 +1,12 @@
 import machine
 import onewire
 import ds18x20
-from machine import Pin, I2C, SoftSPI 
 import time
 import json
+from machine import Pin, I2C, SoftSPI 
 from umqtt.simple import MQTTClient
 from ads1x15 import ADS1115  # Assuming you have the ads1x15 library by Robert H.H.
-import ssd1306
-# import lcd_i2c
-from machine import SoftI2C    # Import the machine module
-from machine_i2c_lcd import I2cLcd
-from time import sleep
-
+import micropython_ota
 
 # Constants
 MQTT_BROKER = '192.168.1.4'  # Replace with your MQTT server address
@@ -27,9 +22,6 @@ I2C_ADDR = 0x27     # DEC 39, HEX 0x27
 NUM_ROWS = 2
 NUM_COLS = 16
 
-# import captive
-# captive.start()
-
 # Pins:
 # 0 SPI miso
 # 1 REPL UART TX
@@ -42,18 +34,6 @@ NUM_COLS = 16
 # 14 I2C slc
 # 15 SPI sck
 # 16 WAKEUP SPI rst
-
-
-# Define the LCD I2C address and dimensions
-I2C_ADDR = 0x27
-I2C_NUM_ROWS = 2
-I2C_NUM_COLS = 16
-
-i2c = SoftI2C(sda=Pin(33), scl=Pin(35), freq=400000)  # Create the I2C interface
-lcd = I2cLcd(i2c, I2C_ADDR, I2C_NUM_ROWS, I2C_NUM_COLS)
-
-lcd.putstr("It's working :)")
-lcd.backlight_on()
 
 # Setup OneWire and DS18x20
 ds_pin = machine.Pin(4)  # Use the correct pin for your setup (D2 on ESP8266 is GPIO4)
@@ -170,7 +150,7 @@ def publish_discovery_payload(client, unique_id, version):
             "boiler_temperature": {
                 "platform": "sensor",
                 "device_class":"temperature",
-                # "unit_of_measurement":"°C",
+                "unit_of_measurement":"\u00B0C",
                 "value_template":"{{ value_json.temperature}}",
                 "unique_id":f"wega_{unique_id}_t",
             },
@@ -268,19 +248,42 @@ def main():
                 bar = None
             if temp is not None or pressure is not None:
                 if pressure is not None: 
-                    bar = round((pressure - 4212)/2000, 1)
+                    bar = round((pressure - 4200)/3100, 1)
                 else:
                     bar = None
 
                 if temp is not None: 
-                    temp = round(temp, 2)
+                    temp = round(temp, 1)
                 client = publish_sensor_data(client, unique_id, temp, bar, pressure)
 
-                lcd.clear()
-                lcd.putstr("Temp: {} °C".format(temp))
+                # lcd.move_to(0, 0)
+                # lcd.putstr("Temp: {} °C".format(temp))
 
             time.sleep(5)  # Sleep for a short interval to avoid busy-waiting
             watchdog.feed()
+            check_update()
+            time.sleep(5) 
+            watchdog.feed()
+
+def check_update():
+    
+    try:
+        with open("update.dat") as file:
+            lines = file.readlines()
+    except Exception as error:
+        print(error)
+        pass
+
+    password = lines[0].strip()
+
+    micropython_ota.ota_update(
+                host='http://192.168.1.2:8000',
+                project='esp-temp-and-pressure',
+                filenames=['boot.py', 'main.py'],
+                use_version_prefix=False,
+                user='admin',
+                passwd=password
+            )
 
 if __name__ == "__main__":
     try:

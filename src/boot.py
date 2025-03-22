@@ -3,9 +3,6 @@ from wifi_manager import WifiManager
 import gc
 import machine
 
-# watchdog = machine.WDT(timeout=30000)  # Set the watchdog timer to 30 seconds
-
-
 gc.collect()  # Free up memory
 gc.threshold(gc.mem_free() // 4 + gc.mem_alloc())
 print("free mem:", gc.mem_free())

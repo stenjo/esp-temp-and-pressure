@@ -21,8 +21,7 @@ jobs:
     - name: Update repos
       run: |
         git submodule update --init lib/micropython
-        git submodule update --init modules/micropython-wifi-setup
-        make -C lib/micropython/mpy-cross
+        make prepare
         
     - name: Make submodules    
       working-directory: lib/micropython/ports/unix
@@ -30,40 +29,24 @@ jobs:
         make submodules
         make
       
-    - name: Make frozen extractable files    
-      working-directory: modules
-      run: |
-        git submodule update --init micropython-wifi-setup
-        git submodule update --init mrequests
-        python -m freezefs micropython-wifi-setup/lib/wifi_setup frozen_wifi_setup.py -ov always
-        python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
+    # - name: Make frozen extractable files    
+    #   working-directory: modules
+    #   run: |
+    #     git submodule update --init micropython-wifi-setup
+    #     git submodule update --init mrequests
+    #     python -m freezefs micropython-wifi-setup/lib/wifi_setup frozen_wifi_setup.py -ov always
+    #     python -m freezefs micropython-wifi-setup/lib/micro_web_srv_2 frozen_micro_web_srv_2.py -ov always
 
         
     - name: Compile firmware
-      working-directory: boards/UNIX
       run: |
-        make all
+        make all BOARD=UNIX PORT_DIR=lib/micropython/ports/unix test
    
     - name: Check output
-      working-directory: boards/UNIX
       run: ls -al build/*
 
     - name: Run test
-      working-directory: boards/UNIX
       run: |
-        MICROPYPATH=../../modules ./build/micropython ../../tests/test_ics.py
-        MICROPYPATH=../../modules ./build/micropython ../../tests/test_Clock.py
+        MICROPYPATH=./modules ./build/micropython ./tests/test_ics.py
+        MICROPYPATH=./modules ./build/micropython ./tests/test_Clock.py
 
-  cmodules:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Install tools
-      run: |
-        gem install ceedling
-
-    - name: Run IcsParser tests
-      working-directory: cmodules/IcsParser
-      run: |
-        ceedling

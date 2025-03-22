@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.5](https://github.com/stenjo/esp-temp-and-pressure/compare/v1.0.4...v1.0.5) (2025-03-22)
+
+
+### Bug Fixes
+
+* **ota:** handling fault situations ([08cf8ee](https://github.com/stenjo/esp-temp-and-pressure/commit/08cf8ee79445358e441df7a43af48a7efdbbd028))
+* **ota:** handling fault situations ([61daf59](https://github.com/stenjo/esp-temp-and-pressure/commit/61daf593cbe6ff06e6cb34e2f6c385f57a3c3d08))
+
 ## [1.0.4](https://github.com/stenjo/esp-temp-and-pressure/compare/v1.0.3...v1.0.4) (2025-03-22)
 
 

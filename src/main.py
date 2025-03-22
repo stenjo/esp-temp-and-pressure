@@ -6,7 +6,7 @@ import json
 from machine import Pin, I2C, SoftSPI 
 from umqtt.simple import MQTTClient
 from ads1x15 import ADS1115  # Assuming you have the ads1x15 library by Robert H.H.
-import micropython_ota
+from ota_update import check_ota
 
 # Constants
 MQTT_BROKER = '192.168.1.4'  # Replace with your MQTT server address
@@ -261,7 +261,7 @@ def main():
 
             time.sleep(5)  # Sleep for a short interval to avoid busy-waiting
             watchdog.feed()
-            check_update()
+            check_ota()
             time.sleep(5) 
             watchdog.feed()
 

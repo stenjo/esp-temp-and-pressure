@@ -69,10 +69,11 @@ copy:
 	sleep 2
 
 copy_main:
-	rshell -p $(REPL) rm /pyboard/boot.py
+	rshell -p $(REPL) rm -rf /pyboard/*
 	rshell -p $(REPL) cp -r src/main.py /pyboard
 	rshell -p $(REPL) cp -r src/wifi.dat /pyboard
 	rshell -p $(REPL) cp -r src/update.dat /pyboard
-	rshell -p $(REPL) cp -r src/version.txt /pyboard
+	rshell -p $(REPL) cp -r src/version /pyboard
+	rshell -p $(REPL) cp -r src/creds.py /pyboard
 	rshell -p $(REPL) cp -r src/boot.py /pyboard
 	sleep 2

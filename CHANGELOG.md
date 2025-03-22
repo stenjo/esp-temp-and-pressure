@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.0 (2025-03-20)
+
+
+### Features
+
+* **config:** adding homeassistant auto discovery ([2c9f092](https://github.com/stenjo/esp-temp-and-pressure/commit/2c9f0929e15a1f58a7dbc55242ec63b5bf4e9a38))
+* **display:** add 2 line LCD display ([25893aa](https://github.com/stenjo/esp-temp-and-pressure/commit/25893aa4f8db65d515c76f77739f6d5744c2499b))
+
+
+### Bug Fixes
+
+* **release:** add missing workflow ([8a673fe](https://github.com/stenjo/esp-temp-and-pressure/commit/8a673fe138c2cd31387e5f3fd9d9e9fca14a6277))
+
 ## [1.2.1](https://github.com/stenjo/dot-matrix-calendar/compare/v1.2.0...v1.2.1) (2024-07-24)
 
 

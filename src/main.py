@@ -124,7 +124,7 @@ def read_pressure():
         print('Failed to read pressure sensor')
         return None
 
-with open("version.txt", "r") as file:
+with open("version", "r") as file:
     version = file.read().strip()
 
 print(version)
@@ -265,24 +265,8 @@ def main():
             time.sleep(5) 
             watchdog.feed()
 
-def check_update():
-    
-    lines = []
-    try:
-        with open("update.dat") as file:
-            lines = file.readlines()
-    except Exception as error:
-        print(error)
-        pass
 
-    password = lines[0].strip()
 
-    micropython_ota.check_for_ota_update(
-                host='http://192.168.1.2:8000',
-                project='esp-temp-and-pressure',
-                user='admin',
-                passwd=password
-            )
 
 if __name__ == "__main__":
     try:

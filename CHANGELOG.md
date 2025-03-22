@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.3](https://github.com/stenjo/esp-temp-and-pressure/compare/v1.0.2...v1.0.3) (2025-03-22)
+
+
+### Bug Fixes
+
+* **ota:** pull correct version ([5e893e8](https://github.com/stenjo/esp-temp-and-pressure/commit/5e893e8d9cbd0d008968507f8da7a3fe3e9bb829))
+* **ota:** pull correct version ([023d663](https://github.com/stenjo/esp-temp-and-pressure/commit/023d663862bb14a70740d28eb51d3e4a84a1164b))
+
 ## [1.0.2](https://github.com/stenjo/esp-temp-and-pressure/compare/v1.0.1...v1.0.2) (2025-03-22)
 
 

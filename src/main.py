@@ -248,7 +248,7 @@ def main():
                 bar = None
             if temp is not None or pressure is not None:
                 if pressure is not None: 
-                    bar = round((pressure - 4200)/3100, 1)
+                    bar = round((pressure - 32767)/3100, 1)
                 else:
                     bar = None
 

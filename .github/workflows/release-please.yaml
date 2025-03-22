@@ -24,7 +24,7 @@ jobs:
           release-type: simple
           token: ${{secrets.PERSONAL_ACCESS_TOKEN}}
 
-      # Additional step that updates version.txt in the src/ subfolder
+      # Additional step that updates version in the src/ subfolder
       - name: Checkout repo
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/checkout@v4
@@ -32,22 +32,22 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       
-      - name: Update version.txt
+      - name: Update version
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         continue-on-error: true
         run: |
           # Extract the version number from the latest git tag
           VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
           
-          # Update version.txt with the new version in the src/ subfolder
-          echo $VERSION > src/version.txt
+          # Update version with the new version in the src/ subfolder
+          echo $VERSION > src/version
           
-          # Optionally commit and push version.txt to the repo
+          # Optionally commit and push version to the repo
           git config --global credential.helper '!f() { sleep 1; echo "username=git token=${{ secrets.PERSONAL_ACCESS_TOKEN }}"; }; f'
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git add src/version.txt
-          git commit -m "chore: update version.txt to $VERSION"
+          git add src/version
+          git commit -m "chore: update version to $VERSION"
           git push
     
       - name: tag major and minor versions
